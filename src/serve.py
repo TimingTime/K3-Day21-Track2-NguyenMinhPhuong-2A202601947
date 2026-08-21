@@ -13,13 +13,13 @@ MODEL_PATH = Path(
 )
 EXPECTED_FEATURE_COUNT = 12
 FEATURE_NAMES = [
-    "fixed_acidity",
-    "volatile_acidity",
-    "citric_acid",
-    "residual_sugar",
+    "fixed acidity",
+    "volatile acidity",
+    "citric acid",
+    "residual sugar",
     "chlorides",
-    "free_sulfur_dioxide",
-    "total_sulfur_dioxide",
+    "free sulfur dioxide",
+    "total sulfur dioxide",
     "density",
     "pH",
     "sulphates",
