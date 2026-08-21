@@ -38,7 +38,7 @@
    curl.exe http://3.227.211.151:8000/health
    curl.exe -X POST http://3.227.211.151:8000/predict `
      -H "Content-Type: application/json" `
-     -d '{"features":[7.4,0.7,0.0,1.9,0.076,11,34,0.9978,3.51,0.56,9.4,0]}'
+     -d '{\"features\":[7.4,0.7,0.0,1.9,0.076,11,34,0.9978,3.51,0.56,9.4,0]}'
    ```
 
 6. `06-s3-data.png`: trong S3 Console, chụp bucket
