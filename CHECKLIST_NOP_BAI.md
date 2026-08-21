@@ -12,27 +12,26 @@
 - [x] Commit dữ liệu Phase 2 tự kích hoạt pipeline, đạt accuracy `0.746`.
 - [x] Báo cáo ngắn: [`BAO_CAO.md`](BAO_CAO.md).
 
-## Ảnh bạn cần tự chụp trước khi tắt AWS
+## Ảnh minh chứng đã lưu trong repository
+
+- [x] `evidence/01-mlflow-runs.png`: 8 matching runs; bảng nhìn thấy nhiều run
+  cùng hai cột `accuracy` và `f1_score`.
+- [x] `evidence/02-actions-overview.png`: lịch sử các workflow run.
+- [x] `evidence/03-actions-phase1-green.png`: Phase 1 có đủ bốn job xanh.
+- [x] `evidence/04-actions-phase2-green.png`: commit dữ liệu Phase 2 kích hoạt đủ
+  bốn job xanh.
+- [x] `evidence/05-eval-gate-blocked.png`: Eval thất bại và Deploy bị bỏ qua.
+- [x] `evidence/06-s3-model.png`: model tại `models/latest/model.pkl`.
+- [x] `evidence/07-s3-dvc-data.png`: object DVC dưới `dvc/files/md5/`.
+- [x] `evidence/08-s3-cli-verification.png`: AWS CLI xác minh cả `dvc/` và model.
+- [x] `evidence/09-api-predict-result.png`: API trả dự đoán hợp lệ.
+
+## Ảnh nên chụp thêm trước khi tắt AWS
 
 Đặt tên ảnh theo thứ tự dưới đây để người chấm dễ đối chiếu:
 
-1. `01-mlflow-runs.png`: chạy lệnh sau rồi mở `http://127.0.0.1:5000` và chụp
-   bảng MLflow có ít nhất 3 runs cùng các cột tham số, Accuracy và F1.
-
-   ```powershell
-   .\.venv\Scripts\mlflow.exe ui --backend-store-uri sqlite:///mlflow.db --port 5000
-   ```
-
-2. `02-actions-phase1.png`: chụp
-   [run #7](https://github.com/TimingTime/K3-Day21-Track2-NguyenMinhPhuong-2A202601947/actions/runs/32468250157)
-   với cả bốn job màu xanh.
-3. `03-eval-gate-block.png`: chụp
-   [run #5](https://github.com/TimingTime/K3-Day21-Track2-NguyenMinhPhuong-2A202601947/actions/runs/32466134872)
-   cho thấy Eval thất bại và Deploy bị bỏ qua khi accuracy là `0.656`.
-4. `04-actions-phase2.png`: chụp
-   [run #2](https://github.com/TimingTime/K3-Day21-Track2-NguyenMinhPhuong-2A202601947/actions/runs/32463770858)
-   của commit thêm dữ liệu Phase 2, cả bốn job màu xanh.
-5. `05-api-health-predict.png`: chụp terminal sau khi chạy:
+1. `10-api-health-predict.png`: chụp terminal sau khi chạy cả hai lệnh (ảnh
+   `09-api-predict-result.png` hiện mới chỉ có JSON của `/predict`):
 
    ```powershell
    curl.exe http://3.227.211.151:8000/health
@@ -41,10 +40,7 @@
      -d '{\"features\":[7.4,0.7,0.0,1.9,0.076,11,34,0.9978,3.51,0.56,9.4,0]}'
    ```
 
-6. `06-s3-data.png`: trong S3 Console, chụp bucket
-   `k3-day21-mlops-432649418926`, gồm prefix `dvc/` và
-   `models/latest/model.pkl`.
-7. `07-s3-model-versions.png`: bật **Show versions** và chụp lịch sử các phiên
+2. `11-s3-model-versions.png`: bật **Show versions** và chụp lịch sử các phiên
    bản của `models/latest/model.pkl`.
 
 ## Hạng mục gửi cho giảng viên
@@ -52,7 +48,8 @@
 1. URL repo:
    `https://github.com/TimingTime/K3-Day21-Track2-NguyenMinhPhuong-2A202601947`
 2. File [`BAO_CAO.md`](BAO_CAO.md) hoặc xuất file này thành PDF một trang.
-3. Bảy ảnh theo thứ tự ở trên.
+3. Các ảnh trong thư mục `evidence/`; ưu tiên bổ sung hai ảnh còn thiếu ở mục
+   trên nếu giảng viên yêu cầu minh chứng trực quan đầy đủ.
 4. Nếu rubric gốc vẫn ghi gate `0.70`, đính kèm bằng chứng giảng viên đã phê
    duyệt đổi gate xuống `0.68`.
 
