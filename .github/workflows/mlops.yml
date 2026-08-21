@@ -94,19 +94,12 @@ jobs:
           ACCURACY=$(python -c "import json; print(json.load(open('outputs/metrics.json'))['accuracy'])")
           echo "accuracy=${ACCURACY}" >> "$GITHUB_OUTPUT"
 
-      - name: Upload model to Amazon S3
-        env:
-          CLOUD_BUCKET: ${{ secrets.CLOUD_BUCKET }}
-        run: |
-          python - <<'PY'
-          import os
-          import boto3
-
-          bucket = os.environ["CLOUD_BUCKET"]
-          key = "models/latest/model.pkl"
-          boto3.client("s3").upload_file("models/model.pkl", bucket, key)
-          print(f"Uploaded model to s3://{bucket}/{key}")
-          PY
+      - name: Save model as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: model
+          path: models/model.pkl
+          if-no-files-found: error
 
       - name: Save metrics as artifact
         uses: actions/upload-artifact@v4
@@ -140,6 +133,46 @@ jobs:
     needs: eval
     runs-on: ubuntu-latest
     steps:
+      - name: Download approved model
+        uses: actions/download-artifact@v4
+        with:
+          name: model
+          path: models
+
+      - name: Authenticate to AWS
+        env:
+          AWS_CREDENTIALS_JSON: ${{ secrets.CLOUD_CREDENTIALS }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+
+          credentials = json.loads(os.environ["AWS_CREDENTIALS_JSON"])
+          required = ("aws_access_key_id", "aws_secret_access_key")
+          missing = [name for name in required if not credentials.get(name)]
+          if missing:
+              raise SystemExit(f"CLOUD_CREDENTIALS is missing: {', '.join(missing)}")
+
+          values = {
+              "AWS_ACCESS_KEY_ID": credentials["aws_access_key_id"],
+              "AWS_SECRET_ACCESS_KEY": credentials["aws_secret_access_key"],
+              "AWS_DEFAULT_REGION": credentials.get("region", "us-east-1"),
+          }
+          if credentials.get("aws_session_token"):
+              values["AWS_SESSION_TOKEN"] = credentials["aws_session_token"]
+
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
+              for name, value in values.items():
+                  env_file.write(f"{name}={value}\n")
+          PY
+
+      - name: Promote approved model to Amazon S3
+        env:
+          CLOUD_BUCKET: ${{ secrets.CLOUD_BUCKET }}
+        run: |
+          aws s3 cp models/model.pkl \
+            "s3://${CLOUD_BUCKET}/models/latest/model.pkl"
+
       - name: Restart API service on EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
