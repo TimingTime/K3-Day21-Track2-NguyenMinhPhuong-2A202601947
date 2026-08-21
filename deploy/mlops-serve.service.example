@@ -1,0 +1,17 @@
+[Unit]
+Description=MLOps Wine Quality API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/mlops-lab
+Environment="CLOUD_BUCKET=REPLACE_WITH_BUCKET_NAME"
+Environment="AWS_DEFAULT_REGION=us-east-1"
+ExecStart=/home/ubuntu/mlops-lab/.venv/bin/python -m uvicorn src.serve:app --host 0.0.0.0 --port 8000
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
