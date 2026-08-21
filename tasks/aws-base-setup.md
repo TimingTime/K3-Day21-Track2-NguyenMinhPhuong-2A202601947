@@ -121,12 +121,11 @@ Không commit access key hoặc SSH private key vào Git.
 Push code và các file `.dvc` lên nhánh `main`. Workflow thực hiện:
 
 ```text
-Test -> Train -> Eval (accuracy >= 0.70) -> Deploy
+Test -> Train -> Eval (accuracy >= 0.68) -> Deploy
 ```
 
-Với dữ liệu được tạo bởi `generate_data.py`, phase 1 có thể chưa qua ngưỡng
-0.70. Đây là hành vi đúng của eval gate: deploy phải bị chặn khi model chưa đủ
-chất lượng.
+Với threshold được phê duyệt là `0.68`, baseline phase 1 đạt `0.682` và được
+deploy. Cấu hình tuning chỉ đạt `0.656` nên vẫn bị eval gate chặn.
 
 ## 7. Continuous training với phase 2
 

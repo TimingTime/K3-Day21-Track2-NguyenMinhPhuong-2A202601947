@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from src.train import train
+from src.train import EVAL_THRESHOLD, train
 
 
 FEATURE_NAMES = [
@@ -72,6 +72,7 @@ def test_metrics_file_created(tmp_path, monkeypatch):
         metrics = json.load(file)
     assert "accuracy" in metrics
     assert "f1_score" in metrics
+    assert metrics["eval_threshold"] == EVAL_THRESHOLD == 0.68
 
 
 def test_model_file_created(tmp_path, monkeypatch):

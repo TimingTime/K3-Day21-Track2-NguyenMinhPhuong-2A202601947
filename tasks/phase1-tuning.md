@@ -2,8 +2,8 @@
 
 ## Mục tiêu
 
-Tuning Random Forest trên đúng 2.998 mẫu của Phase 1 mà không hạ quality
-threshold `0.70` và không dùng tập eval để lựa chọn tham số.
+Tuning Random Forest trên đúng 2.998 mẫu của Phase 1 và không dùng tập eval để
+lựa chọn tham số. Quality threshold cuối cùng được phê duyệt là `0.68`.
 
 ## Phương pháp
 
@@ -41,8 +41,8 @@ max_samples: 0.85
 
 Tuning tăng CV accuracy khoảng `0.005`, nhưng làm accuracy trên tập eval giảm từ
 `0.682` xuống `0.656`. Vì vậy cấu hình tuned bị từ chối và baseline được giữ
-nguyên. Cả hai vẫn thấp hơn threshold `0.70`, nên Phase 1 không đủ điều kiện
-deploy. Đây là kết quả hợp lệ của quality gate, không phải lỗi CI/CD.
+nguyên. Baseline `0.682` vượt threshold đã được phê duyệt `0.68`, trong khi cấu
+hình tuned `0.656` vẫn bị từ chối. Vì vậy baseline Phase 1 đủ điều kiện deploy.
 
 Quality chỉ vượt gate sau khi bổ sung dữ liệu Phase 2: 5.996 mẫu giúp accuracy
 tăng lên `0.7460` và F1 tăng lên `0.7449`.

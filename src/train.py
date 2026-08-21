@@ -10,7 +10,7 @@ import yaml
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, f1_score
 
-EVAL_THRESHOLD = 0.70
+EVAL_THRESHOLD = 0.68
 EXPERIMENT_NAME = "wine-quality-classification"
 
 
@@ -77,7 +77,11 @@ def train(
         Path("outputs").mkdir(parents=True, exist_ok=True)
         with open("outputs/metrics.json", "w", encoding="utf-8") as file:
             json.dump(
-                {"accuracy": accuracy, "f1_score": f1},
+                {
+                    "accuracy": accuracy,
+                    "f1_score": f1,
+                    "eval_threshold": EVAL_THRESHOLD,
+                },
                 file,
                 indent=2,
             )

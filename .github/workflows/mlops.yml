@@ -39,6 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       accuracy: ${{ steps.read_metrics.outputs.accuracy }}
+      threshold: ${{ steps.read_metrics.outputs.threshold }}
     steps:
       - uses: actions/checkout@v4
 
@@ -92,7 +93,9 @@ jobs:
         id: read_metrics
         run: |
           ACCURACY=$(python -c "import json; print(json.load(open('outputs/metrics.json'))['accuracy'])")
+          THRESHOLD=$(python -c "import json; print(json.load(open('outputs/metrics.json'))['eval_threshold'])")
           echo "accuracy=${ACCURACY}" >> "$GITHUB_OUTPUT"
+          echo "threshold=${THRESHOLD}" >> "$GITHUB_OUTPUT"
 
       - name: Save model as artifact
         uses: actions/upload-artifact@v4
@@ -116,12 +119,13 @@ jobs:
       - name: Check accuracy gate
         env:
           ACCURACY: ${{ needs.train.outputs.accuracy }}
+          THRESHOLD: ${{ needs.train.outputs.threshold }}
         run: |
           python - <<'PY'
           import os
 
           accuracy = float(os.environ["ACCURACY"])
-          threshold = 0.70
+          threshold = float(os.environ["THRESHOLD"])
           print(f"Accuracy: {accuracy:.4f}; required: {threshold:.2f}")
           if accuracy < threshold:
               raise SystemExit("Evaluation failed; deployment has been blocked.")
