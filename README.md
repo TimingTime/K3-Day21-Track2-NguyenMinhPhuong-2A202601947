@@ -267,6 +267,9 @@ Nộp các hạng mục sau:
 
 Các thách thức dưới đây không bắt buộc. Hoàn thành đủ cả 5 thách thức sẽ được cộng tối đa 20 điểm, nâng tổng điểm lên 100.
 
+Phần triển khai bonus của repository được mô tả tại
+[`tasks/bonus.md`](tasks/bonus.md).
+
 ### Bonus 1: Tracking MLflow Từ Xa Với DagsHub (4 điểm)
 
 Thay vì lưu MLflow vào file cục bộ (`sqlite:///mlflow.db`), kết nối đến server MLflow miễn phí trên DagsHub:

@@ -3,8 +3,16 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import pytest
+from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
+from sklearn.pipeline import Pipeline
 
-from src.train import EVAL_THRESHOLD, train
+from src.train import (
+    EVAL_THRESHOLD,
+    _build_model,
+    _label_distribution,
+    train,
+)
 
 
 FEATURE_NAMES = [
@@ -73,6 +81,14 @@ def test_metrics_file_created(tmp_path, monkeypatch):
     assert "accuracy" in metrics
     assert "f1_score" in metrics
     assert metrics["eval_threshold"] == EVAL_THRESHOLD == 0.68
+    assert metrics["model_type"] == "random_forest"
+    assert set(metrics["per_class"]) == {"0", "1", "2"}
+    assert set(metrics["label_distribution"]) == {"0", "1", "2"}
+    assert sum(metrics["label_distribution"].values()) == pytest.approx(1.0)
+
+    report = Path("outputs/report.txt").read_text(encoding="utf-8")
+    assert "Confusion matrix" in report
+    assert "class precision recall f1 support" in report
 
 
 def test_model_file_created(tmp_path, monkeypatch):
@@ -87,3 +103,46 @@ def test_model_file_created(tmp_path, monkeypatch):
     )
 
     assert Path("models/model.pkl").exists()
+
+
+@pytest.mark.parametrize(
+    ("params", "expected_type"),
+    [
+        (
+            {"model_type": "random_forest", "n_estimators": 10},
+            RandomForestClassifier,
+        ),
+        (
+            {"model_type": "gradient_boosting", "n_estimators": 10},
+            GradientBoostingClassifier,
+        ),
+        (
+            {"model_type": "logistic_regression", "max_iter": 100},
+            Pipeline,
+        ),
+    ],
+)
+def test_build_model_supports_bonus_algorithms(params, expected_type):
+    """Bonus model_type selects each supported classifier."""
+    model_type, model, logged_params = _build_model(params)
+
+    assert isinstance(model, expected_type)
+    assert logged_params["model_type"] == model_type
+
+
+def test_build_model_rejects_unknown_algorithm():
+    """Invalid model types fail with a useful error."""
+    with pytest.raises(ValueError, match="Unsupported model_type"):
+        _build_model({"model_type": "unknown"})
+
+
+def test_label_distribution_warns_for_rare_classes(capsys):
+    """Classes below ten percent generate drift warnings."""
+    distribution, warnings = _label_distribution(
+        pd.Series([0] * 95 + [1] * 5)
+    )
+
+    assert distribution == {"0": 0.95, "1": 0.05, "2": 0.0}
+    assert len(warnings) == 2
+    assert "Class 1" in warnings[0]
+    assert "WARNING:" in capsys.readouterr().out
